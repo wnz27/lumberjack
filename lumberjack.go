@@ -201,9 +201,13 @@ func (l *Logger) rotate() error {
 	if err := l.close(); err != nil {
 		return err
 	}
+
+	// 新建一个文件
 	if err := l.openNew(); err != nil {
 		return err
 	}
+
+	//  压缩 和 删除旧文件
 	l.mill()
 	return nil
 }
@@ -236,8 +240,8 @@ func (l *Logger) openNew() error {
 	}
 
 	// we use truncate here because this should only get called when we've moved
-	// the file ourselves. if someone else creates the file in the meantime,
-	// just wipe out the contents.
+	// the file ourselves.
+	// if someone else creates the file in the meantime, just wipe out the contents.
 	f, err := os.OpenFile(name, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, mode)
 	if err != nil {
 		return fmt.Errorf("can't open new logfile: %s", err)
