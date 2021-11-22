@@ -449,6 +449,7 @@ func TestOldLogFiles(t *testing.T) {
 	megabyte = 1
 
 	dir := makeTempDir("TestOldLogFiles", t)
+	//fmt.Println("---->", dir)
 	defer os.RemoveAll(dir)
 
 	filename := logFile(dir)
@@ -536,6 +537,7 @@ func TestLocalTime(t *testing.T) {
 func TestRotate(t *testing.T) {
 	currentTime = fakeTime
 	dir := makeTempDir("TestRotate", t)
+	fmt.Println("--->", dir)
 	defer os.RemoveAll(dir)
 
 	filename := logFile(dir)
@@ -567,6 +569,7 @@ func TestRotate(t *testing.T) {
 	existsWithContent(filename2, b, t)
 	existsWithContent(filename, []byte{}, t)
 	fileCount(dir, 2, t)
+	fmt.Println("2222: ", filename2)
 	newFakeTime()
 
 	err = l.Rotate()
@@ -579,6 +582,7 @@ func TestRotate(t *testing.T) {
 	filename3 := backupFile(dir)
 	existsWithContent(filename3, []byte{}, t)
 	existsWithContent(filename, []byte{}, t)
+	fmt.Println("2222: ", filename3)
 	fileCount(dir, 2, t)
 
 	b2 := []byte("foooooo!")
@@ -595,7 +599,8 @@ func TestCompressOnRotate(t *testing.T) {
 	megabyte = 1
 
 	dir := makeTempDir("TestCompressOnRotate", t)
-	defer os.RemoveAll(dir)
+	fmt.Println("---->", dir)
+	//defer os.RemoveAll(dir)
 
 	filename := logFile(dir)
 	l := &Logger{

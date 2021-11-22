@@ -128,21 +128,24 @@ var (
 	megabyte = 1024 * 1024
 )
 
-// Write implements io.Writer.  If a write would cause the log file to be larger
-// than MaxSize, the file is closed, renamed to include a timestamp of the
-// current time, and a new log file is created using the original log file name.
+// Write implements io.Writer.
+// If a write would cause the log file to be larger than MaxSize,
+// the file is closed, renamed to include a timestamp of the current time,
+// and a new log file is created using the original log file name.
 // If the length of the write is greater than MaxSize, an error is returned.
 func (l *Logger) Write(p []byte) (n int, err error) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 
 	writeLen := int64(len(p))
+	// 一次写入的量 大于 限制的话直接报错
 	if writeLen > l.max() {
 		return 0, fmt.Errorf(
 			"write length %d exceeds maximum file size %d", writeLen, l.max(),
 		)
 	}
 
+	// 如果file 指向的空指针
 	if l.file == nil {
 		if err = l.openExistingOrNew(len(p)); err != nil {
 			return 0, err
@@ -258,9 +261,9 @@ func backupName(name string, local bool) string {
 	return filepath.Join(dir, fmt.Sprintf("%s-%s%s", prefix, timestamp, ext))
 }
 
-// openExistingOrNew opens the logfile if it exists and if the current write
-// would not put it over MaxSize.  If there is no such file or the write would
-// put it over the MaxSize, a new file is created.
+// openExistingOrNew opens the logfile if it exists and
+// if the current write would not put it over MaxSize.
+// If there is no such file or the write would put it over the MaxSize, a new file is created.
 func (l *Logger) openExistingOrNew(writeLen int) error {
 	l.mill()
 
