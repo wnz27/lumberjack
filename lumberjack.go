@@ -145,19 +145,21 @@ func (l *Logger) Write(p []byte) (n int, err error) {
 		)
 	}
 
-	// 如果file 指向的空指针
+	// 如果file 指向的空指针 则打开或新建
 	if l.file == nil {
 		if err = l.openExistingOrNew(len(p)); err != nil {
 			return 0, err
 		}
 	}
 
+	// 如果当前大小加上要写入的 大于了 最大限制则执行 切分
 	if l.size+writeLen > l.max() {
 		if err := l.rotate(); err != nil {
 			return 0, err
 		}
 	}
 
+	// 向file 写入 日志
 	n, err = l.file.Write(p)
 	l.size += int64(n)
 
@@ -206,8 +208,9 @@ func (l *Logger) rotate() error {
 	return nil
 }
 
-// openNew opens a new log file for writing, moving any old log file out of the
-// way.  This methods assumes the file has already been closed.
+// openNew opens a new log file for writing,
+// moving any old log file out of the way.
+// This methods assumes the file has already been closed.
 func (l *Logger) openNew() error {
 	err := os.MkdirAll(l.dir(), 0755)
 	if err != nil {
@@ -381,6 +384,7 @@ func (l *Logger) millRunOnce() error {
 func (l *Logger) millRun() {
 	for range l.millCh {
 		// what am I going to do, log this?
+		// 压缩 和 删除旧文件
 		_ = l.millRunOnce()
 	}
 }
